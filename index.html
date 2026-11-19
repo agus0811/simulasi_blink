@@ -3,389 +3,255 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simulasi Mikrokontroler: Arduino LED Blink</title>
+  <title>Simulasi Arduino LED Blink</title>
   <style>
-    :root {
-      --bg-color: #0d1117;
-      --card-bg: #161b22;
-      --border-color: #30363d;
-      --text-main: #c9d1d9;
-      --text-muted: #8b949e;
-      --accent: #58a6ff;
-      --btn-green: #238636;
-      --btn-red: #da3633;
-    }
-
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-main);
+      font-family: system-ui, -apple-system, sans-serif;
+      background-color: #f4f6f8;
+      color: #1f2937;
       margin: 0;
       padding: 20px;
       display: flex;
-      flex-direction: column;
-      align-items: center;
+      justify-content: center;
     }
 
-    header {
+    .app-box {
+      background: #ffffff;
+      max-width: 540px;
+      width: 100%;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
       text-align: center;
-      margin-bottom: 24px;
     }
 
     h1 {
-      font-size: 1.6rem;
-      margin-bottom: 6px;
-      color: #ffffff;
+      font-size: 1.4rem;
+      margin: 0 0 6px 0;
     }
 
-    p.subtitle {
-      color: var(--text-muted);
-      margin: 0;
+    p.desc {
+      color: #6b7280;
       font-size: 0.95rem;
+      margin: 0 0 24px 0;
     }
 
-    .container {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-      max-width: 960px;
-      width: 100%;
-    }
-
-    @media (max-width: 768px) {
-      .container {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 10px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .card-title {
-      font-weight: 600;
-      font-size: 1.05rem;
-      margin-bottom: 16px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--border-color);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    /* Visual Rangkaian */
-    .board-area {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      flex-grow: 1;
-      padding: 20px 0;
-      position: relative;
-    }
-
-    .arduino-uno {
-      width: 260px;
-      height: 170px;
-      background: #00878f;
-      border-radius: 8px;
-      border: 3px solid #005f66;
-      position: relative;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-      padding: 12px;
-      box-sizing: border-box;
-    }
-
-    .usb-port {
-      width: 36px;
-      height: 44px;
-      background: #b0b8c0;
-      border: 2px solid #768390;
-      position: absolute;
-      left: -14px;
-      top: 22px;
-      border-radius: 3px;
-    }
-
-    .chip-atmega {
-      width: 110px;
-      height: 28px;
-      background: #222;
-      color: #888;
-      font-size: 10px;
-      font-family: monospace;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: absolute;
-      bottom: 24px;
-      right: 25px;
-      border-radius: 2px;
-      border: 1px solid #444;
-    }
-
-    .board-label {
-      color: white;
-      font-weight: bold;
-      font-size: 13px;
-      position: absolute;
-      top: 48px;
-      left: 36px;
-      letter-spacing: 0.5px;
-    }
-
-    .onboard-led-group {
-      position: absolute;
-      top: 48px;
-      right: 35px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 11px;
-      color: white;
-      font-family: monospace;
-    }
-
-    .led-smd {
-      width: 10px;
-      height: 10px;
-      border-radius: 2px;
-      background: #4a3b00;
-      transition: all 0.08s ease;
-    }
-
-    .led-smd.active {
-      background: #ffea00;
-      box-shadow: 0 0 10px #ffea00, 0 0 20px #ffaa00;
-    }
-
-    /* LED Eksternal & Kabel */
-    .external-circuit {
-      display: flex;
-      align-items: center;
-      gap: 24px;
-      margin-bottom: 22px;
-      background: #0d1117;
-      padding: 14px 24px;
-      border-radius: 8px;
-      border: 1px dashed var(--border-color);
-    }
-
-    .led-bulb {
-      width: 34px;
-      height: 34px;
-      border-radius: 50% 50% 45% 45%;
-      background: #4b1113;
-      border: 2px solid #7a1c20;
-      position: relative;
-      transition: all 0.08s ease;
-    }
-
-    .led-bulb.active {
-      background: #ff3b30;
-      border-color: #ff8a80;
-      box-shadow: 0 0 18px #ff3b30, 0 0 36px rgba(255, 59, 48, 0.7);
-    }
-
-    .resistor {
-      width: 44px;
-      height: 14px;
-      background: #d2b48c;
-      border-radius: 3px;
-      display: flex;
-      justify-content: space-evenly;
-      align-items: center;
-      border: 1px solid #8b7355;
-    }
-
-    .band { width: 4px; height: 100%; }
-    .band-red { background: #d32f2f; }
-    .band-brown { background: #5d4037; }
-    .band-gold { background: #fbc02d; }
-
-    /* Kontrol */
-    .controls {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      margin-top: 18px;
-      padding-top: 14px;
-      border-top: 1px solid var(--border-color);
-    }
-
-    .btn-row {
-      display: flex;
-      gap: 10px;
-    }
-
-    button {
-      flex: 1;
-      padding: 10px 14px;
-      border: none;
-      border-radius: 6px;
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 0.9rem;
-      color: white;
-      transition: opacity 0.15s;
-    }
-
-    button:hover { opacity: 0.9; }
-    .btn-start { background-color: var(--btn-green); }
-    .btn-stop { background-color: var(--btn-red); }
-
-    .slider-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      font-size: 0.88rem;
-    }
-
-    .slider-header {
-      display: flex;
-      justify-content: space-between;
-    }
-
-    input[type="range"] {
-      width: 100%;
-      accent-color: var(--accent);
-      cursor: pointer;
-    }
-
-    /* Tampilan Kode */
-    pre {
-      background: #0d1117;
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      padding: 14px;
-      overflow-x: auto;
-      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-      font-size: 0.86rem;
-      line-height: 1.5;
-      margin: 0;
-      flex-grow: 1;
-    }
-
-    .code-line {
-      display: block;
-      padding: 1px 6px;
-      border-radius: 3px;
-    }
-
-    .code-line.highlight {
-      background-color: rgba(88, 166, 255, 0.2);
-      border-left: 3px solid var(--accent);
-    }
-
-    .kw { color: #ff7b72; }
-    .fn { color: #d2a8ff; }
-    .num { color: #79c0ff; }
-    .cm { color: #8b949e; }
-
-    .status-badge {
-      font-size: 0.78rem;
-      padding: 3px 8px;
+    /* Area Lampu LED & Papan */
+    .stage {
+      background: #1e293b;
       border-radius: 12px;
-      background: #21262d;
-      color: var(--text-muted);
+      padding: 28px 16px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
     }
 
-    .status-badge.running {
-      background: rgba(35, 134, 54, 0.25);
-      color: #3fb950;
+    .led-circle {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background-color: #451a1a;
+      border: 4px solid #7f1d1d;
+      transition: all 0.08s ease;
+    }
+
+    .led-circle.on {
+      background-color: #ef4444;
+      border-color: #fca5a5;
+      box-shadow: 0 0 25px #ef4444, 0 0 50px rgba(239, 68, 68, 0.8);
+    }
+
+    .status-text {
+      color: #e2e8f0;
+      font-family: monospace;
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* Tombol Utama */
+    .btn-main {
+      width: 100%;
+      padding: 14px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      color: white;
+      background-color: #dc2626;
+      margin-bottom: 16px;
+      transition: background 0.15s;
+    }
+
+    .btn-main.stopped {
+      background-color: #16a34a;
+    }
+
+    /* Pilihan Kecepatan */
+    .speed-label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #4b5563;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .speed-group {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .btn-speed {
+      padding: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border: 2px solid #e5e7eb;
+      background: #f9fafb;
+      color: #374151;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .btn-speed.active {
+      border-color: #2563eb;
+      background: #eff6ff;
+      color: #1d4ed8;
+    }
+
+    /* Kotak Kode Ringkas */
+    details {
+      text-align: left;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 10px 14px;
+    }
+
+    summary {
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      color: #2563eb;
+    }
+
+    pre {
+      margin: 12px 0 0 0;
+      font-size: 0.85rem;
+      overflow-x: auto;
+      color: #0f172a;
+      line-height: 1.45;
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1>Simulasi Mikrokontroler: Arduino LED Blink</h1>
-    <p class="subtitle">Simulasi eksekusi pin digital 13 pada Arduino Uno secara interaktif</p>
-  </header>
+  <div class="app-box">
+    <h1>Simulasi Arduino LED Blink</h1>
+    <p class="desc">Klik tombol di bawah untuk menguji kedipan lampu pada Pin 13</p>
 
-  <div class="container">
-    <!-- Panel Rangkaian -->
-    <div class="card">
-      <div class="card-title">
-        <span>Rangkaian Virtual</span>
-        <span id="statusBadge" class="status-badge">Berhenti</span>
-      </div>
-
-      <div class="board-area">
-        <div class="external-circuit">
-          <div style="text-align: center;">
-            <div id="extLed" class="led-bulb"></div>
-            <div style="font-size: 11px; margin-top: 6px; color: #8b949e;">LED Pin 13</div>
-          </div>
-          <div style="text-align: center;">
-            <div class="resistor">
-              <div class="band band-red"></div>
-              <div class="band band-red"></div>
-              <div class="band band-brown"></div>
-              <div class="band band-gold"></div>
-            </div>
-            <div style="font-size: 11px; margin-top: 6px; color: #8b949e;">220 &Omega;</div>
-          </div>
-          <div style="font-size: 12px; font-family: monospace; color: #58a6ff;">
-            PIN 13: <strong id="pinStateText">LOW (0V)</strong>
-          </div>
-        </div>
-
-        <div class="arduino-uno">
-          <div class="usb-port"></div>
-          <div class="board-label">ARDUINO UNO</div>
-          <div class="onboard-led-group">
-            <span>L</span>
-            <div id="onboardLed" class="led-smd"></div>
-          </div>
-          <div class="chip-atmega">ATMEGA328P</div>
-        </div>
-      </div>
-
-      <div class="controls">
-        <div class="slider-group">
-          <div class="slider-header">
-            <label for="delaySlider">Waktu Tunda (<code>delay</code>):</label>
-            <strong id="delayDisplay">1000 ms</strong>
-          </div>
-          <input type="range" id="delaySlider" min="100" max="2000" step="100" value="1000">
-        </div>
-
-        <div class="btn-row">
-          <button id="btnStart" class="btn-start">Mulai Simulasi</button>
-          <button id="btnStop" class="btn-stop">Hentikan</button>
-        </div>
-      </div>
+    <div class="stage">
+      <div id="led" class="led-circle"></div>
+      <div id="status" class="status-text">STATUS: MATI (LOW)</div>
     </div>
 
-    <!-- Panel Kode Program -->
-    <div class="card">
-      <div class="card-title">
-        <span>Kode Program (<code>sketch.ino</code>)</span>
-        <span style="font-size: 0.8rem; color: #8b949e;">C++ / Arduino</span>
-      </div>
+    <button id="toggleBtn" class="btn-main">Hentikan Simulasi</button>
 
-      <pre><code><span class="cm">// Pin 13 terhubung ke LED internal &amp; eksternal</span>
-<span class="kw">const int</span> ledPin = <span class="num">13</span>;
+    <span class="speed-label">Pilih Kecepatan Kedip:</span>
+    <div class="speed-group">
+      <button class="btn-speed" data-delay="250">Cepat (0.25 dtk)</button>
+      <button class="btn-speed active" data-delay="1000">Normal (1 dtk)</button>
+      <button class="btn-speed" data-delay="2000">Lambat (2 dtk)</button>
+    </div>
 
-<span class="kw">void</span> <span class="fn">setup</span>() {
-  <span class="fn">pinMode</span>(ledPin, OUTPUT);
+    <details>
+      <summary>Lihat Kode Arduino (sketch.ino)</summary>
+      <pre><code id="codeBlock">const int ledPin = 13;
+
+void setup() {
+  pinMode(ledPin, OUTPUT);
 }
 
-<span class="kw">void</span> <span class="fn">loop</span>() {
-<span id="lineHigh" class="code-line">  <span class="fn">digitalWrite</span>(ledPin, HIGH); <span class="cm">// LED Menyala</span></span>
-<span id="lineDelay1" class="code-line">  <span class="fn">delay</span>(<span id="codeDelay1" class="num">1000</span>);</span>
-<span id="lineLow" class="code-line">  <span class="fn">digitalWrite</span>(ledPin, LOW);  <span class="cm">// LED Mati</span></span>
-<span id="lineDelay2" class="code-line">  <span class="fn">delay</span>(<span id="codeDelay2" class="num">1000</span>);</span>
+void loop() {
+  digitalWrite(ledPin, HIGH);
+  delay(1000);
+  digitalWrite(ledPin, LOW);
+  delay(1000);
 }</code></pre>
-    </div>
+    </details>
   </div>
 
   <script>
-    const extLed = document.getElementById('extLed');
-    const onboardLed = document.getElementById('onboardLed');
+    const led = document.getElementById('led');
+    const statusText = document.getElementById('status');
+    const toggleBtn = document.getElementById('toggleBtn');
+    const speedBtns = document.querySelectorAll('.btn-speed');
+    const codeBlock = document.getElementById('codeBlock');
+
+    let running = true;
+    let isOn = false;
+    let delayTime = 1000;
+    let loopTimer = null;
+
+    function updateCodeDisplay(ms) {
+      codeBlock.textContent = `const int ledPin = 13;
+
+void setup() {
+  pinMode(ledPin, OUTPUT);
+}
+
+void loop() {
+  digitalWrite(ledPin, HIGH);
+  delay(${ms});
+  digitalWrite(ledPin, LOW);
+  delay(${ms});
+}`;
+    }
+
+    function blinkLoop() {
+      if (!running) return;
+      isOn = !isOn;
+      if (isOn) {
+        led.classList.add('on');
+        statusText.textContent = 'STATUS: MENYALA (HIGH)';
+      } else {
+        led.classList.remove('on');
+        statusText.textContent = 'STATUS: MATI (LOW)';
+      }
+      loopTimer = setTimeout(blinkLoop, delayTime);
+    }
+
+    toggleBtn.addEventListener('click', () => {
+      running = !running;
+      if (running) {
+        toggleBtn.textContent = 'Hentikan Simulasi';
+        toggleBtn.classList.remove('stopped');
+        blinkLoop();
+      } else {
+        clearTimeout(loopTimer);
+        isOn = false;
+        led.classList.remove('on');
+        statusText.textContent = 'STATUS: BERHENTI';
+        toggleBtn.textContent = 'Mulai Simulasi';
+        toggleBtn.classList.add('stopped');
+      }
+    });
+
+    speedBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        speedBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        delayTime = Number(btn.dataset.delay);
+        updateCodeDisplay(delayTime);
+      });
+    });
+
+    // Jalankan otomatis saat dibuka
+    blinkLoop();
+  </script>
+
+</body>
+</html>
